@@ -1,9 +1,10 @@
+#include "processor.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-struct mipsProcessor {
+struct MipsProcessor {
   /* General Purpose Registers
    * Не забудь:
    * $0 всегда возвращает 0!
@@ -19,3 +20,8 @@ struct mipsProcessor {
   uint32_t pc;
   uint32_t pc_next; /* необязательный для branch-delay */
 };
+
+MipsProcessor *processor_create(void) {
+  mipsProcessor *p = malloc(sizeof *p);
+  return p;
+}
