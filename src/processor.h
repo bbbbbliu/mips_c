@@ -6,13 +6,15 @@
 
 typedef struct CPU CPU;
 
+/*
+ * @return A pointer to the newly allocated CPU state.
+ * The caller is responsible for freeing this memory via cpu_destroy().
+ */
 CPU *cpu_create(void);
 void cpu_destroy(CPU *p);
 
-// read and write getters/setters for general purpose registers
 uint32_t read_gpr(const CPU *p, uint8_t idx);
 void write_gpr(CPU *p, uint8_t idx, uint32_t value);
-
 // read and write hi/lo
 uint32_t read_HI(const CPU *p);
 void write_HI(CPU *p, uint32_t value);

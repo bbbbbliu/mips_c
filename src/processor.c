@@ -6,50 +6,51 @@
 #include <stdlib.h>
 
 struct CPU {
-  /* General Purpose Registers
-   * Не забудь:
-   * $0 всегда возвращает 0!
-   * $31 (називается $ra, return address) есть обратный адрес
-   * */
-  uint32_t gpr[32];
+    /* General Purpose Registers
+     * Не забудь:
+     * $0 всегда возвращает 0!
+     * $31 (називается $ra, return address) есть обратный адрес
+     * */
+    uint32_t gpr[31];
 
-  /* Multiply/Divide */
-  uint32_t hi;
-  uint32_t lo;
+    /* Multiply/Divide */
+    uint32_t hi;
+    uint32_t lo;
 
-  /* Program Counters*/
-  uint32_t pc;
-  // uint32_t pc_next; /* необязательный для branch-delay */
+    /* Program Counters*/
+    uint32_t pc;
+    // uint32_t pc_next; /* необязательный для branch-delay */
 };
-// methods for creating and destorying mips instance
+// methods for creating mips instance
 CPU *cpu_create(void) {
-  CPU *p = malloc(sizeof *p);
-  return p;
+    CPU *p = malloc(sizeof *p);
+    return p;
 }
-
+// method for destroying mips
 void cpu_destroy(CPU *p) {
-  if (p == NULL) {
-    return;
-  }
-  free(p);
+    if (p == NULL) {
+        return;
+    }
+    free(p);
 };
 
 // read and write getters/setters for general purpose registers
 uint32_t read_gpr(const CPU *p, uint8_t idx) {
-  assert(idx < 32);
-  if (0 == idx) {
-    return 0;
-  }
+    assert(idx < 32);
+    if (0 == idx) {
+        return 0;
+    }
 
-  return p->gpr[idx];
+    return p->gpr[idx - 1];
 };
 
 void write_gpr(CPU *p, uint8_t idx, uint32_t value) {
-  assert(idx < 32);
-  if (0 == idx) {
-    return;
-  }
-  p->gpr[idx] = value;
+    assert(idx < 32);
+    assert(value <= 0xff);
+    if (0 == idx) {
+        return;
+    }
+    p->gpr[idx - 1] = value;
 };
 // read and write hi/lo
 uint32_t read_HI(const CPU *p) { return p->hi; };
