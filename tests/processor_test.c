@@ -60,3 +60,15 @@ Test(read_write_HI_LO, write_LO_out_of_bounds, .signal = SIGABRT) {
     write_LO(test_cpu, 0x100);
     cpu_destroy(test_cpu);
 }
+
+Test(read_write_HI_LO, read_write, .signal = SIGABRT) {
+    CPU *test_cpu = cpu_create();
+
+    write_LO(test_cpu, 0xff);
+    cr_assert_eq(read_LO(test_cpu), 0xff, "failed read and/or write LO, expected 0xff, got 0x%X", read_LO(test_cpu));
+
+    write_HI(test_cpu, 0xff);
+    cr_assert_eq(read_HI(test_cpu), 0xff, "failed read and/or write HI, expected 0xff, got 0x%X", read_HI(test_cpu));
+
+    cpu_destroy(test_cpu);
+}
