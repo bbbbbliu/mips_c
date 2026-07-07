@@ -1,0 +1,10 @@
+#+title:mips c project
+#+description: a mips emulator written in c
+#+author: Byron Liu
+
+* CPU:
+** TODO unit testing
+- [ ] Test GPR ($0, $1-$31)
+- [ ]
+
+** TODO
