@@ -7,87 +7,107 @@
 #include <stdint.h>
 #define TEST_FILENAME "temp_test_binary.bin"
 
-Test(get_size, get_size) {
+Test(ram, get_size) {
     RAM *test_ram = ram_create(0x100000); // 4 megabytes of ram
     cr_assert_eq(get_size(test_ram), 0x100000, "ram should be 4 megabytes");
     ram_destroy(test_ram);
 }
 
-Test(read_write, read_write_byte) {
+Test(ram, read_write_byte) {
     RAM *test_ram = ram_create(0x10000);
     write_byte(test_ram, 0x00000, 0xff);
-    write_byte(test_ram, 0x10000, 0xaf);
+    write_byte(test_ram, 0x0ffff, 0xaf);
     cr_assert_eq(read_byte(test_ram, 0x00), 0xff,
                  "read byte value incorrect, expected 0xff, got 0x%x",
                  read_byte(test_ram, 0x00));
-    cr_assert_eq(read_byte(test_ram, 0x10000), 0xaf,
+    cr_assert_eq(read_byte(test_ram, 0x0ffff), 0xaf,
                  "read byte value incorrect, expected 0xaf, got 0x%x",
-                 read_byte(test_ram, 0x00));
+                 read_byte(test_ram, 0x0ffff));
     ram_destroy(test_ram);
 }
 
-Test(read_write, read_write_halfword) {
+Test(ram, read_write_halfword) {
     RAM *test_ram = ram_create(0x10000);
     write_half(test_ram, 0x00000, 0xffff);
-    write_half(test_ram, 0x10000 - 1, 0xacbf);
+    write_half(test_ram, 0x0fffe, 0xacbf);
     cr_assert_eq(read_half(test_ram, 0x00), 0xffff,
                  "read half value incorrect, expected 0xffff, got 0x%x",
                  read_half(test_ram, 0x00));
 
-    cr_assert_eq(read_half(test_ram, 0x10000), 0xacbf,
+    cr_assert_eq(read_half(test_ram, 0x0fffe), 0xacbf,
                  "read half value incorrect, expected 0xacbf, got 0x%x",
-                 read_half(test_ram, 0x00));
+                 read_half(test_ram, 0x0fffe));
 
     ram_destroy(test_ram);
 }
 
-Test(read_write, word) {
+Test(ram, read_write_word) {
     RAM *test_ram = ram_create(0x10000);
     write_word(test_ram, 0x00000, 0xffffffff);
-    write_word(test_ram, 0x10000 - 3, 0x1234abcd);
+    write_word(test_ram, 0x0fffc, 0x1234abcd);
     cr_assert_eq(read_word(test_ram, 0x00), 0xffffffff,
                  "read word value incorrect, expected 0xffff, got 0x%x",
                  read_word(test_ram, 0x00));
 
-    cr_assert_eq(read_word(test_ram, 0x10000), 0x1234abcd,
+    cr_assert_eq(read_word(test_ram, 0x0fffc), 0x1234abcd,
                  "read word value incorrect, expected 0xacbf, got 0x%x",
-                 read_word(test_ram, 0x00));
+                 read_word(test_ram, 0x0fffc));
 
     ram_destroy(test_ram);
 }
 
-Test(overflow, readbyte, .signal = SIGABRT) {
+Test(ram, readbyte, .signal = SIGABRT) {
     RAM *test_ram = ram_create(0x10000);
-    read_byte(test_ram, 0x10001);
+    read_byte(test_ram, 0x10000);
     ram_destroy(test_ram);
 }
 
-Test(overflow, writebyte, .signal = SIGABRT) {
+Test(ram, writebyte, .signal = SIGABRT) {
     RAM *test_ram = ram_create(0x10000);
-    write_byte(test_ram, 0x10001, 0xff);
+    write_byte(test_ram, 0x10000, 0xff);
     ram_destroy(test_ram);
 }
 
-Test(overflow, readhalf, .signal = SIGABRT) {
-    RAM *test_ram = ram_create(0x10000);
-    read_half(test_ram, 0x10000);
+Test(ram, readhalf_overflow, .signal = SIGABRT) {
+    RAM *test_ram = ram_create(17);
+    read_half(test_ram, 16);
     ram_destroy(test_ram);
 }
 
-Test(overflow, writehalf, .signal = SIGABRT) {
-    RAM *test_ram = ram_create(0x10000);
-    write_half(test_ram, 0x10000, 0xff);
+Test(ram, writehalf_overflow, .signal = SIGABRT) {
+    RAM *test_ram = ram_create(17);
+    write_half(test_ram, 16, 0xff);
     ram_destroy(test_ram);
 }
-Test(overflow, readword, .signal = SIGABRT) {
-    RAM *test_ram = ram_create(0x10000);
-    read_word(test_ram, 0x10000 - 2);
+Test(ram, readword_overflow, .signal = SIGABRT) {
+    RAM *test_ram = ram_create(15);
+    read_word(test_ram, 12);
     ram_destroy(test_ram);
 }
 
-Test(overflow, writeword, .signal = SIGABRT) {
-    RAM *test_ram = ram_create(0x10000);
-    write_word(test_ram, 0x10000 - 2, 0xff);
+Test(ram, writeword_overflow, .signal = SIGABRT) {
+    RAM *test_ram = ram_create(15);
+    write_word(test_ram, 12, 0xff);
+    ram_destroy(test_ram);
+}
+Test(ram, readhalf_alignment, .signal = SIGABRT) {
+    RAM *test_ram = ram_create(16);
+    read_half(test_ram, 1);
+    ram_destroy(test_ram);
+}
+Test(ram, writehalf_alignment, .signal = SIGABRT) {
+    RAM *test_ram = ram_create(16);
+    write_half(test_ram, 1, 0xffff);
+    ram_destroy(test_ram);
+}
+Test(ram, readword_alignment, .signal = SIGABRT) {
+    RAM *test_ram = ram_create(16);
+    read_word(test_ram, 1);
+    ram_destroy(test_ram);
+}
+Test(ram, writeword_alignment, .signal = SIGABRT) {
+    RAM *test_ram = ram_create(16);
+    write_word(test_ram, 1, 0xff);
     ram_destroy(test_ram);
 }
 Test(load_file, loadfile) {
@@ -144,4 +164,31 @@ Test(clear_ram, clearram) {
                  "value at memory address 3 should be 0 after clear");
 
     ram_destroy(test_ram);
+}
+
+Test(ram_diagnostics, hex_dump_with_memstream) {
+    RAM *ram = ram_create(16);
+    write_word(ram, 0x00, 0x12345678);
+
+    char *buffer = NULL;
+    size_t size = 0;
+
+    // Open an in-memory stream that writes dynamically directly to our buffer
+    // string
+    FILE *mem_stream = open_memstream(&buffer, &size);
+
+    // Pass the memory stream instead of stdout
+    ram_dump(mem_stream, ram, 0x00, 4);
+
+    fclose(mem_stream); // Forces the stream to flush calculations directly into
+                        // 'buffer'
+
+    // Verify natively
+    cr_assert_str_eq(
+        buffer,
+        "--- RAM DUMP (Start: 0x00000000, Length: 4 bytes) ---   0x00000000: "
+        "78 56 34 12                                      | xV4.\n");
+
+    free(buffer); // Clean up the memory string allocation
+    ram_destroy(ram);
 }
