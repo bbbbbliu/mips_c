@@ -4,7 +4,20 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-typedef struct CPU CPU;
+/* typedef struct CPU CPU; */
+typedef struct {
+    /* General Purpose Registers
+     * */
+    uint32_t gpr[31];
+
+    /* Multiply/Divide */
+    uint32_t hi, lo;
+
+    /* Program Counters*/
+    uint32_t pc;
+    // uint32_t pc_next; /* необязательный для branch-delay */
+    bool pause;
+} CPU;
 
 /*
  * @return A pointer to the newly allocated CPU state.

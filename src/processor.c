@@ -14,12 +14,12 @@ struct CPU {
     uint32_t gpr[31];
 
     /* Multiply/Divide */
-    uint32_t hi;
-    uint32_t lo;
+    uint32_t hi, lo;
 
     /* Program Counters*/
     uint32_t pc;
     // uint32_t pc_next; /* необязательный для branch-delay */
+    bool pause;
 };
 // methods for creating mips instance
 CPU *cpu_create(void) {
@@ -56,21 +56,15 @@ void write_gpr(CPU *p, uint8_t idx, uint32_t value) {
 uint32_t read_HI(const CPU *p) { return p->hi; };
 
 // write hi register (32 bit value)
-void write_HI(CPU *p, uint32_t value) {
-    p->hi = value;
-};
+void write_HI(CPU *p, uint32_t value) { p->hi = value; };
 
 uint32_t read_LO(const CPU *p) { return p->lo; };
 
-void write_LO(CPU *p, uint32_t value) {
-    p->lo = value;
-};
+void write_LO(CPU *p, uint32_t value) { p->lo = value; };
 // increment and get program counter
 uint32_t get_pc(const CPU *p) { return p->pc; };
 void increment_pc(CPU *p) {
     assert(p->pc + 4 <= 0xffffffff);
     p->pc += 4;
 };
-void set_pc(CPU *p, uint32_t address) {
-    p->pc = address;
-};
+void set_pc(CPU *p, uint32_t address) { p->pc = address; };
